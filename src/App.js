@@ -6,11 +6,11 @@ import WebcamCapture from './WebcamCapture';
 import './App.css';
 
 library.add(faSave, faQuestion, faWindowClose)
-// let width = parseInt(window.outerWidth * 0.4)
-// let height = parseInt(window.outerHeight * 0.5)
+let width = parseInt(window.outerWidth * 0.4)
+let height = parseInt(window.outerHeight * 0.4)
 
-let width = 640
-let height = 480
+// let width = 640
+// let height = 480
 
 class App extends Component {
     render() {
