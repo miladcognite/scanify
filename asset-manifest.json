@@ -1,13 +1,13 @@
 {
   "main.css": "/scanify/static/css/main.229bb3d2.chunk.css",
-  "main.js": "/scanify/static/js/main.2e1ecb41.chunk.js",
-  "main.js.map": "/scanify/static/js/main.2e1ecb41.chunk.js.map",
+  "main.js": "/scanify/static/js/main.2e1cd7db.chunk.js",
+  "main.js.map": "/scanify/static/js/main.2e1cd7db.chunk.js.map",
   "runtime~main.js": "/scanify/static/js/runtime~main.a6d84658.js",
   "runtime~main.js.map": "/scanify/static/js/runtime~main.a6d84658.js.map",
   "static/js/2.ddece81d.chunk.js": "/scanify/static/js/2.ddece81d.chunk.js",
   "static/js/2.ddece81d.chunk.js.map": "/scanify/static/js/2.ddece81d.chunk.js.map",
   "index.html": "/scanify/index.html",
-  "precache-manifest.2bb31260b3847d5a96a68c90df739794.js": "/scanify/precache-manifest.2bb31260b3847d5a96a68c90df739794.js",
+  "precache-manifest.62659aef86e18ea33f6393436096e5cb.js": "/scanify/precache-manifest.62659aef86e18ea33f6393436096e5cb.js",
   "service-worker.js": "/scanify/service-worker.js",
   "static/css/main.229bb3d2.chunk.css.map": "/scanify/static/css/main.229bb3d2.chunk.css.map",
   "static/media/help.png": "/scanify/static/media/help.d4843ea6.png"
