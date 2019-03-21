@@ -6,14 +6,16 @@ import WebcamCapture from './WebcamCapture';
 import './App.css';
 
 library.add(faSave, faQuestion, faWindowClose)
-let width = parseInt(window.outerWidth * 0.4)
-let height = parseInt(window.outerHeight * 0.4)
-
-// let width = 640
-// let height = 480
 
 class App extends Component {
     render() {
+        // let height = parseInt(window.innerHeight * 0.7)
+        // let width = parseInt(height * 1.5)
+
+        let width = 640
+        let height = 480
+
+        console.log("[INFO] Camera dimensions", width, "X", height)
         return (
             <div className="App">
                 <div className="App-header">

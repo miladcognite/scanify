@@ -34,10 +34,6 @@ class Help extends Component {
                 />
                 <Modal
                     visible={this.state.visible ? this.state.visible : false}
-                    style={{
-                        width: this.props.width,
-                        height: this.props.height,
-                    }}
                     // effect="fadeInUp"
                     onClickAway={() => this.closeModal()}>
                     <div className="Helper"
@@ -48,9 +44,8 @@ class Help extends Component {
                             alt=""
                             style={{
                                 visibility: "visible",
-                                display: "block",
-                                width: this.props.width,
-                                height: this.props.height,
+                                width: this.props.width * 0.5,
+                                height: this.props.height * 0.5,
                             }}
                         />
                         <FontAwesomeIcon

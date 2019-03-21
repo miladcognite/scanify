@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import Webcam from "react-webcam";
+// import Webcam from "react-webcam";
 import JSZip from 'jszip'
 import saveAs from 'file-saver'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import Webcam from './Webcam';
 import Screenshot from './Screenshot';
 import { findMatches, train } from './Analyze'
 import Help from './Help';
@@ -33,26 +34,28 @@ class WebcamCapture extends Component {
 
     tick = () => {
         if (this.webcam.getCanvas()) {
-            var result = findMatches(
-                this.props.width,
-                this.props.height,
+            var matchCount = findMatches(
+                this.props.width * this.props.scale,
+                this.props.height * this.props.scale,
+                this.props.scale,
                 this.webcam.getCanvas().getContext('2d'),
                 this.refs.cameraCanvas.getContext('2d'),
                 this.refs.imageCanvas.getContext('2d'),
             )
 
-            this.checkCount(result.count, result.num_matches)
+            this.checkCount(matchCount)
         }
         requestAnimationFrame(this.tick);
     };
 
-    checkCount = (keypoints, matchCount) => {
+    checkCount = (matchCount) => {
 
         let lowCount = 50
         let highCount = 110
 
         if (this.state.previousImageSrc) {
             if (matchCount < lowCount) {
+                this.refs.cameraCanvas.getContext('2d').fillStyle = "#990000";
                 if (this.state.bordercolor !== "#990000") {
                     console.log("[Warning] Take new picture!", matchCount)
                     this.setState({
@@ -62,6 +65,7 @@ class WebcamCapture extends Component {
 
 
             } else if (matchCount > highCount) {
+                this.refs.cameraCanvas.getContext('2d').fillStyle = "#76ee00";
                 if (this.state.bordercolor !== "#76ee00") {
                     console.log("[INFO] It's ok, keep moving!", matchCount)
                     this.setState({
@@ -71,6 +75,7 @@ class WebcamCapture extends Component {
             }
             else {
                 if (this.state.bordercolor !== "#e67e22") {
+                    this.refs.cameraCanvas.getContext('2d').fillStyle = "#e67e22";
                     console.log("[INFO] Slow down!", matchCount)
                     this.setState({
                         bordercolor: "#e67e22"
@@ -117,7 +122,7 @@ class WebcamCapture extends Component {
     }
 
     saveImages = () => {
-        console.log("[INFO] Saving image", this.state.previousImageSrc)
+        console.log("[INFO] Saving image")
 
         var zip = new JSZip();
         var imageFolder = zip.folder("images");
@@ -144,19 +149,18 @@ class WebcamCapture extends Component {
     render() {
         const style = {
             borderColor: this.state.bordercolor ? this.state.bordercolor : "#fff",
+            width: this.props.width,
+            height: this.props.height
         };
         const videoConstraints = {
-            facingMode: "left",
-            width: this.props.width,
-            height: this.props.height,
+            facingMode: "environment",
             screenshotQuality: 1,
-
-            deviceId: "OStgA83clORqptsn1sqH+Y36bvd2C2ZjlrLVvVjiWto="
+            // minScreenshotWidth: 1920,
+            // minScreenshotHeight: 1080,
         };
-
         return (
-            <div className="App-main">
 
+            <div className="App-main">
                 <div className="container">
                     <div className="wrapper" style={style}>
                         <canvas ref="cameraCanvas"
@@ -169,10 +173,15 @@ class WebcamCapture extends Component {
                             ref={this.setRef}
                             width={this.props.width}
                             height={this.props.height}
+                            scale={this.props.scale}
                             screenshotFormat="image/jpeg"
                             videoConstraints={videoConstraints}
                             onUserMedia={this.onUserMedia}
-                            style={{ visibility: 'hidden' }} // add check
+                            style={{
+                                visibility: 'visible',
+                                // width: this.props.width,
+                                // height: this.props.height
+                            }} // add check
                         />
                         <button
                             className="btn"
@@ -186,7 +195,10 @@ class WebcamCapture extends Component {
                             onClick={this.saveImages}
                             style={{ visibility: this.state.previousImageSrc ? 'visible' : 'hidden' }}
                         />
-                        <Help />
+                        <Help
+                            width={this.props.width}
+                            height={this.props.height}
+                        />
 
                     </div>
                 </div>
@@ -214,6 +226,6 @@ class WebcamCapture extends Component {
     }
 }
 
-WebcamCapture.defaultProps = { limit: 30, padding: 0 };
+WebcamCapture.defaultProps = { limit: 30, padding: 0, scale: 0.25 };
 
 export default WebcamCapture;

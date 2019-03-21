@@ -1,16 +1,27 @@
 import jsfeat from 'jsfeat'
 
 let screen_corners = [];
-let screen_descriptors;
 let matches = [];
-
-let pattern_corners;
 let pattern_descriptors;
 
+let laplacian_threshold = 30
+let min_eigen_value_threshold = 25
+let threshold = 20;
 
-let img_u8 = new jsfeat.matrix_t(640, 480, jsfeat.U8_t | jsfeat.C1_t);
-let img_u8_smooth = new jsfeat.matrix_t(640, 480, jsfeat.U8_t | jsfeat.C1_t);
-screen_descriptors = new jsfeat.matrix_t(32, 500, jsfeat.U8_t | jsfeat.C1_t);
+let widthConst = 640
+let heightConst = 480
+let rescaleFactor = 1
+let featureSize = 32
+let featureCount = 500
+
+let pixelCount = widthConst * heightConst;
+let img_u8 = new jsfeat.matrix_t(rescaleFactor * widthConst, rescaleFactor * heightConst, jsfeat.U8_t | jsfeat.C1_t);
+let screen_descriptors = new jsfeat.matrix_t(featureSize, featureCount, jsfeat.U8_t | jsfeat.C1_t);
+
+
+jsfeat.yape06.laplacian_threshold = laplacian_threshold;
+jsfeat.yape06.min_eigen_value_threshold = min_eigen_value_threshold;
+jsfeat.fast_corners.set_threshold(threshold);
 
 
 var match_t = (function () {
@@ -28,66 +39,49 @@ var match_t = (function () {
     return match_t;
 })();
 
-let i = 640 * 480;
-while (--i >= 0) {
-    screen_corners[i] = new jsfeat.keypoint_t(0, 0, 0, 0, -1);
-    matches[i] = new match_t();
+while (--pixelCount >= 0) {
+    screen_corners[pixelCount] = new jsfeat.keypoint_t(0, 0, 0, 0, -1);
+    matches[pixelCount] = new match_t();
 }
 
-
-export function findMatches(width, height, cameraContext, cameraOverlayConext, imageContext) {
-    // console.log("[INFO] finding matches...")
-
-    let threshold = 20;
-    let laplacian_threshold = 30
-    let min_eigen_value_threshold = 25
+export function findMatches(width, height, scale, cameraContext, cameraOverlayConext, imageContext) {
     let blurRadius = 5
     let maxKeypoints = 500
-    let drawKeypoints = true
+    let drawKeypoints = false
 
-    let num_matches = 0;
-    let good_matches = 0;
+    let matchCount = 0;
     let count = 0;
 
-
     let cameraData = cameraContext.getImageData(0, 0, width, height);
-    // let imageData = imageContext.getImageData(0, 0, width, height);
 
-
-    jsfeat.fast_corners.set_threshold(threshold);
     jsfeat.imgproc.grayscale(cameraData.data, width, height, img_u8);
-    jsfeat.imgproc.gaussian_blur(img_u8, img_u8_smooth, blurRadius);
-    jsfeat.yape06.laplacian_threshold = laplacian_threshold;
-    jsfeat.yape06.min_eigen_value_threshold = min_eigen_value_threshold;
-
-    count = detect_keypoints(img_u8_smooth, screen_corners, maxKeypoints);
-    jsfeat.orb.describe(img_u8_smooth, screen_corners, count, screen_descriptors);
+    // jsfeat.imgproc.resample(img_u8_re, img_u8, img_u8.cols, img_u8.rows);
+    jsfeat.imgproc.gaussian_blur(img_u8, img_u8, blurRadius);
 
 
-    // // console.log("[INFO] number of keypoints detected in video:", count)
+    count = detect_keypoints(img_u8, screen_corners, maxKeypoints);
+    jsfeat.orb.describe(img_u8, screen_corners, count, screen_descriptors);
+
+
     if (drawKeypoints) {
         var data_u32 = new Uint32Array(cameraData.data.buffer);
         render_corners(screen_corners, count, data_u32, width);
         cameraOverlayConext.putImageData(cameraData, 0, 0);
     }
 
+
     if (pattern_descriptors && screen_descriptors) {
-        // console.log("Length", pattern_descriptors.length)
         // good_matches = find_transform(matches, num_matches);
-        num_matches = match_pattern(screen_descriptors, pattern_descriptors, matches);
-        // console.log("[INFO] number of matches:", num_matches)
+        matchCount = match_pattern(screen_descriptors, pattern_descriptors, matches);
+        render_matches(cameraOverlayConext, matches, matchCount, scale)
     }
-    return { count, num_matches }
+    return matchCount
 
 }
 
-
-
 export function train() {
-    pattern_corners = [];
     pattern_descriptors = [];
     pattern_descriptors = [JSON.parse(JSON.stringify(screen_descriptors))]
-
 };
 
 function match_pattern(screen_descriptors, pattern_descriptors, matches) {
@@ -165,8 +159,8 @@ function match_pattern(screen_descriptors, pattern_descriptors, matches) {
 function render_corners(corners, count, img, step) {
     var pix = (0xff << 24) | (0x00 << 16) | (0xff << 8) | 0x00;
     for (var i = 0; i < count; ++i) {
-        var x = corners[i].x;
-        var y = corners[i].y;
+        var x = corners[i].x / rescaleFactor;
+        var y = corners[i].y / rescaleFactor;
         var off = (x + y * step);
         img[off] = pix;
         img[off - 1] = pix;
@@ -177,17 +171,12 @@ function render_corners(corners, count, img, step) {
 
 }
 
-function render_matches(ctx, matches, count) {
-
+function render_matches(ctx, matches, count, scale) {
+    ctx.clearRect(0, 0, widthConst, heightConst);
     for (var i = 0; i < count; ++i) {
         var m = matches[i];
         var s_kp = screen_corners[m.screen_idx];
-        var p_kp = pattern_corners[m.pattern_lev][m.pattern_idx];
-        ctx.beginPath();
-        ctx.moveTo(s_kp.x, s_kp.y);
-        ctx.lineTo(p_kp.x * 0.5, p_kp.y * 0.5); // our preview is downscaled
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        ctx.fillRect(parseInt(s_kp.x / scale), parseInt(s_kp.y / scale), 3, 3)
     }
 }
 
