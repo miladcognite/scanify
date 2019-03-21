@@ -1,26 +1,26 @@
 self.__precacheManifest = [
   {
-    "revision": "d4843ea6350aa13ece06a456a6fb9564",
-    "url": "/scanify/static/media/help.d4843ea6.png"
+    "revision": "34de6ba31bf1b2004fd60777e85888fa",
+    "url": "/scanify/static/media/help.34de6ba3.png"
   },
   {
     "revision": "a6d846586291a95d6788",
     "url": "/scanify/static/js/runtime~main.a6d84658.js"
   },
   {
-    "revision": "f84b01755d945ca75ca1",
-    "url": "/scanify/static/js/main.f84b0175.chunk.js"
+    "revision": "19e3692c736ccd0219ff",
+    "url": "/scanify/static/js/main.19e3692c.chunk.js"
   },
   {
     "revision": "ddece81df2a1c2c45aa5",
     "url": "/scanify/static/js/2.ddece81d.chunk.js"
   },
   {
-    "revision": "f84b01755d945ca75ca1",
+    "revision": "19e3692c736ccd0219ff",
     "url": "/scanify/static/css/main.94c5c20c.chunk.css"
   },
   {
-    "revision": "352658348ff0bda3c943ba58925cce5e",
+    "revision": "f33f9d7495bc557f6e7c70af2b25c3c2",
     "url": "/scanify/index.html"
   }
 ];
