@@ -22,6 +22,19 @@ class WebcamCapture extends Component {
         this.tick = this.tick.bind(this);
     }
 
+    setRef = webcam => {
+        this.webcam = webcam;
+    };
+
+
+    onUserMedia = () => {
+        console.log("[INFO] Camers is ready")
+        this.setState({
+            cameraIsReady: true
+        })
+
+    }
+
     componentDidMount() {
         this.setState({
             previousImageSrc: null,
@@ -30,6 +43,12 @@ class WebcamCapture extends Component {
         requestAnimationFrame(this.tick);
 
 
+    }
+
+    addImage = () => {
+        var newArray = this.state.images.slice();
+        newArray.push(this.state.previousImageSrc);
+        this.setState({ images: newArray })
     }
 
     tick = () => {
@@ -45,8 +64,7 @@ class WebcamCapture extends Component {
     };
 
     checkCount = (matchCount) => {
-        let highCount = 110
-
+        let highCount = 100
         if (this.state.previousImageSrc) {
             let color = matchCount > highCount ? "#76ee00" : this.pickColor(matchCount, highCount)
             this.refs.cameraCanvas.getContext('2d').fillStyle = color
@@ -55,15 +73,6 @@ class WebcamCapture extends Component {
             })
         }
     }
-
-    componentToHex = c => {
-        var hex = c.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-    };
-
-    rgbToHex = (r, g, b) => {
-        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
-    };
 
     pickColor = (matchCount, highCount) => {
         let color2 = [153, 0, 0]
@@ -79,19 +88,15 @@ class WebcamCapture extends Component {
         return this.rgbToHex(rgb[0], rgb[1], rgb[2]);
     };
 
-
-    setRef = webcam => {
-        this.webcam = webcam;
+    componentToHex = c => {
+        var hex = c.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
     };
 
+    rgbToHex = (r, g, b) => {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+    };
 
-    onUserMedia = () => {
-        console.log("[INFO] Camers is ready")
-        this.setState({
-            cameraIsReady: true
-        })
-
-    }
 
 
     capture = () => {
@@ -131,13 +136,6 @@ class WebcamCapture extends Component {
                 saveAs(content, "images.zip");
             });
     }
-
-    addImage = () => {
-        var newArray = this.state.images.slice();
-        newArray.push(this.state.previousImageSrc);
-        this.setState({ images: newArray })
-    }
-
 
     render() {
         const style = {

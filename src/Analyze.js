@@ -11,6 +11,7 @@ let featureSize = 32
 let featureCount = 1000
 let blurRadius = 5
 let maxKeypoints = 500
+let dotSize = 1.5
 
 let widthConst = 640 * 0.4
 let heightConst = 480 * 0.4
@@ -129,23 +130,21 @@ function match_pattern(screen_descriptors, pattern_descriptors, matches) {
         }
 
         // filter out by some threshold
-        var match_threshold = 48;
-        if (best_dist < match_threshold) {
-            matches[num_matches].screen_idx = qidx;
-            matches[num_matches].pattern_lev = best_lev;
-            matches[num_matches].pattern_idx = best_idx;
-            num_matches++;
-        }
-        //
+        // var match_threshold = 48;
+        // if (best_dist < match_threshold) {
+        //     matches[num_matches].screen_idx = qidx;
+        //     matches[num_matches].pattern_lev = best_lev;
+        //     matches[num_matches].pattern_idx = best_idx;
+        //     num_matches++;
+        // }
 
-        /* filter using the ratio between 2 closest matches
-        if(best_dist < 0.8*best_dist2) {
+        // filter using the ratio between 2 closest matches
+        if (best_dist < 0.8 * best_dist2) {
             matches[num_matches].screen_idx = qidx;
             matches[num_matches].pattern_lev = best_lev;
             matches[num_matches].pattern_idx = best_idx;
             num_matches++;
         }
-        */
 
         qd_off += 8; // next query descriptor
     }
@@ -176,7 +175,7 @@ function render_matches(ctx, matches, count) {
     for (var i = 0; i < count; ++i) {
         var m = matches[i];
         var s_kp = screen_corners[m.screen_idx];
-        ctx.fillRect(parseInt(s_kp.x), parseInt(s_kp.y), 2, 2)
+        ctx.fillRect(parseInt(s_kp.x), parseInt(s_kp.y), dotSize, dotSize)
     }
 }
 
