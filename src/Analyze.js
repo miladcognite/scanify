@@ -7,15 +7,16 @@ let pattern_descriptors;
 let laplacian_threshold = 30
 let min_eigen_value_threshold = 25
 let threshold = 20;
-
-let widthConst = 640
-let heightConst = 480
-let rescaleFactor = 1
 let featureSize = 32
-let featureCount = 500
+let featureCount = 1000
+let blurRadius = 5
+let maxKeypoints = 500
+
+let widthConst = 640 * 0.4
+let heightConst = 480 * 0.4
 
 let pixelCount = widthConst * heightConst;
-let img_u8 = new jsfeat.matrix_t(rescaleFactor * widthConst, rescaleFactor * heightConst, jsfeat.U8_t | jsfeat.C1_t);
+let img_u8 = new jsfeat.matrix_t(widthConst, heightConst, jsfeat.U8_t | jsfeat.C1_t);
 let screen_descriptors = new jsfeat.matrix_t(featureSize, featureCount, jsfeat.U8_t | jsfeat.C1_t);
 
 
@@ -44,36 +45,35 @@ while (--pixelCount >= 0) {
     matches[pixelCount] = new match_t();
 }
 
-export function findMatches(width, height, scale, cameraContext, cameraOverlayConext, imageContext) {
-    let blurRadius = 5
-    let maxKeypoints = 500
-    let drawKeypoints = false
-
+export function findMatches(cameraOverlayConext, webcamCanvas) {
     let matchCount = 0;
     let count = 0;
 
-    let cameraData = cameraContext.getImageData(0, 0, width, height);
+    let width = webcamCanvas.width
+    let height = webcamCanvas.height
 
-    jsfeat.imgproc.grayscale(cameraData.data, width, height, img_u8);
-    // jsfeat.imgproc.resample(img_u8_re, img_u8, img_u8.cols, img_u8.rows);
+    let cameraData = webcamCanvas.getContext('2d').getImageData(0, 0, width, height);
+    let orgImg = new jsfeat.matrix_t(width, height, jsfeat.U8_t | jsfeat.C1_t);
+
+    jsfeat.imgproc.grayscale(cameraData.data, width, height, orgImg);
+    jsfeat.imgproc.resample(orgImg, img_u8, img_u8.cols, img_u8.rows);
     jsfeat.imgproc.gaussian_blur(img_u8, img_u8, blurRadius);
-
 
     count = detect_keypoints(img_u8, screen_corners, maxKeypoints);
     jsfeat.orb.describe(img_u8, screen_corners, count, screen_descriptors);
 
 
-    if (drawKeypoints) {
-        var data_u32 = new Uint32Array(cameraData.data.buffer);
-        render_corners(screen_corners, count, data_u32, width);
-        cameraOverlayConext.putImageData(cameraData, 0, 0);
-    }
+    // if (drawKeypoints) {
+    //     var data_u32 = new Uint32Array(cameraData.data.buffer);
+    //     render_corners(screen_corners, count, data_u32, width);
+    //     cameraOverlayConext.putImageData(cameraData, 0, 0);
+    // }
 
 
     if (pattern_descriptors && screen_descriptors) {
         // good_matches = find_transform(matches, num_matches);
         matchCount = match_pattern(screen_descriptors, pattern_descriptors, matches);
-        render_matches(cameraOverlayConext, matches, matchCount, scale)
+        render_matches(cameraOverlayConext, matches, matchCount)
     }
     return matchCount
 
@@ -159,8 +159,8 @@ function match_pattern(screen_descriptors, pattern_descriptors, matches) {
 function render_corners(corners, count, img, step) {
     var pix = (0xff << 24) | (0x00 << 16) | (0xff << 8) | 0x00;
     for (var i = 0; i < count; ++i) {
-        var x = corners[i].x / rescaleFactor;
-        var y = corners[i].y / rescaleFactor;
+        var x = corners[i].x;
+        var y = corners[i].y;
         var off = (x + y * step);
         img[off] = pix;
         img[off - 1] = pix;
@@ -171,12 +171,12 @@ function render_corners(corners, count, img, step) {
 
 }
 
-function render_matches(ctx, matches, count, scale) {
+function render_matches(ctx, matches, count) {
     ctx.clearRect(0, 0, widthConst, heightConst);
     for (var i = 0; i < count; ++i) {
         var m = matches[i];
         var s_kp = screen_corners[m.screen_idx];
-        ctx.fillRect(parseInt(s_kp.x / scale), parseInt(s_kp.y / scale), 3, 3)
+        ctx.fillRect(parseInt(s_kp.x), parseInt(s_kp.y), 2, 2)
     }
 }
 

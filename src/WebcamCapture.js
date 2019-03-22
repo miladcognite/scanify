@@ -35,12 +35,8 @@ class WebcamCapture extends Component {
     tick = () => {
         if (this.webcam.getCanvas()) {
             var matchCount = findMatches(
-                this.props.width * this.props.scale,
-                this.props.height * this.props.scale,
-                this.props.scale,
-                this.webcam.getCanvas().getContext('2d'),
                 this.refs.cameraCanvas.getContext('2d'),
-                this.refs.imageCanvas.getContext('2d'),
+                this.webcam.getCanvas()
             )
 
             this.checkCount(matchCount)
@@ -49,42 +45,39 @@ class WebcamCapture extends Component {
     };
 
     checkCount = (matchCount) => {
-
-        let lowCount = 50
         let highCount = 110
 
         if (this.state.previousImageSrc) {
-            if (matchCount < lowCount) {
-                this.refs.cameraCanvas.getContext('2d').fillStyle = "#990000";
-                if (this.state.bordercolor !== "#990000") {
-                    console.log("[Warning] Take new picture!", matchCount)
-                    this.setState({
-                        bordercolor: "#990000"
-                    })
-                }
-
-
-            } else if (matchCount > highCount) {
-                this.refs.cameraCanvas.getContext('2d').fillStyle = "#76ee00";
-                if (this.state.bordercolor !== "#76ee00") {
-                    console.log("[INFO] It's ok, keep moving!", matchCount)
-                    this.setState({
-                        bordercolor: "#76ee00"
-                    })
-                }
-            }
-            else {
-                if (this.state.bordercolor !== "#e67e22") {
-                    this.refs.cameraCanvas.getContext('2d').fillStyle = "#e67e22";
-                    console.log("[INFO] Slow down!", matchCount)
-                    this.setState({
-                        bordercolor: "#e67e22"
-                    })
-
-                }
-            }
+            let color = matchCount > highCount ? "#76ee00" : this.pickColor(matchCount, highCount)
+            this.refs.cameraCanvas.getContext('2d').fillStyle = color
+            this.setState({
+                bordercolor: color
+            })
         }
     }
+
+    componentToHex = c => {
+        var hex = c.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    rgbToHex = (r, g, b) => {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+    };
+
+    pickColor = (matchCount, highCount) => {
+        let color2 = [153, 0, 0]
+        let color1 = [118, 238, 0]
+
+        var w1 = matchCount / highCount;
+        var w2 = 1 - w1;
+
+        var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+
+        return this.rgbToHex(rgb[0], rgb[1], rgb[2]);
+    };
 
 
     setRef = webcam => {
@@ -179,9 +172,7 @@ class WebcamCapture extends Component {
                             onUserMedia={this.onUserMedia}
                             style={{
                                 visibility: 'visible',
-                                // width: this.props.width,
-                                // height: this.props.height
-                            }} // add check
+                            }}
                         />
                         <button
                             className="btn"
@@ -226,6 +217,6 @@ class WebcamCapture extends Component {
     }
 }
 
-WebcamCapture.defaultProps = { limit: 30, padding: 0, scale: 0.25 };
+WebcamCapture.defaultProps = { scale: 6 };
 
 export default WebcamCapture;

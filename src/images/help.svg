@@ -43,9 +43,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="229.17586"
-     inkscape:cy="158.19573"
+     inkscape:zoom="1.979899"
+     inkscape:cx="206.48172"
+     inkscape:cy="157.88735"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -66,7 +66,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -167,7 +167,7 @@
          x="28.8771"
          y="109.11628"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.06;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, ';text-align:start;text-anchor:start;fill:#282c34;fill-opacity:1;stroke-width:0.13201813"
-         id="tspan857">when frame border becomes yellow.</tspan><tspan
+         id="tspan857">when frame border becomes yellow/orange.</tspan><tspan
          sodipodi:role="line"
          x="28.8771"
          y="115.71719"

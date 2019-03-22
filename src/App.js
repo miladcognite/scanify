@@ -9,11 +9,9 @@ library.add(faSave, faQuestion, faWindowClose)
 
 class App extends Component {
     render() {
-        // let height = parseInt(window.innerHeight * 0.7)
-        // let width = parseInt(height * 1.5)
 
-        let width = 640
-        let height = 480
+        let width = 640 * 0.4
+        let height = 480 * 0.4
 
         console.log("[INFO] Camera dimensions", width, "X", height)
         return (
